@@ -31,7 +31,7 @@ keyboard_problemas = [
 def generar_botones_enfermedades():
     enfermedades = list(enfermedades_sintomas.keys())
     botones = []
-    # Organiza las enfermedades en grupos de 4
+    # Organiza las enfermedades en grupos de 2
     for i in range(0, len(enfermedades), 2):  # Se muestran de 2 en 2
         fila = enfermedades[i:i+2]
         botones.append(fila)
@@ -65,67 +65,66 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif text in ["Insomnio", "Mareo", "Dolor de cabeza", "Baja glucosa", "Dolor de articulaciones", "Deshidratación", "Visión borrosa", "Dolores Crónicos"]:
         # Mostrar soluciones dependiendo del síntoma
-       soluciones = {
-    "Insomnio": (
-        "Medicamentos sugeridos para Insomnio:\n"
-        "- Melatonina 3mg (1 hora antes de dormir)\n"
-        "- Difenhidramina (uso ocasional)\n"
-        "- Valeriana (alternativa natural)\n\n"
-        "Compra aquí: https://www.amazon.com/s?k=melatonina+3mg\n"
-        "Compra aquí: https://www.amazon.com/s?k=difenhidramina\n"
-        "Compra aquí: https://www.amazon.com/s?k=valeriana"
-    ),
-    "Mareo": (
-        "Medicamentos sugeridos para Mareo:\n"
-        "- Dimenhidrinato 50mg (cada 8h si es necesario)\n"
-        "- Meclizina (ideal para vértigo leve)\n\n"
-        "Compra aquí: https://www.amazon.com/s?k=dimenhidrinato+50mg\n"
-        "Compra aquí: https://www.amazon.com/s?k=meclizina"
-    ),
-    "Dolor de cabeza": (
-        "Medicamentos sugeridos:\n"
-        "- Paracetamol 500mg (cada 6h si el dolor persiste)\n"
-        "- Ibuprofeno (si hay inflamación o tensión muscular)\n\n"
-        "Compra aquí: https://www.amazon.com/s?k=paracetamol+500mg\n"
-        "Compra aquí: https://www.amazon.com/s?k=ibuprofeno"
-    ),
-    "Baja glucosa": (
-        "Sugerencia:\n"
-        "- Toma jugo de naranja o come caramelos\n"
-        "- Glucosa en tabletas (si disponible)\n\n"
-        "Compra aquí: https://www.amazon.com/s?k=glucosa+en+tabletas"
-    ),
-    "Dolor de articulaciones": (
-        "Medicamentos sugeridos:\n"
-        "- Ibuprofeno 400mg (cada 8h)\n"
-        "- Naproxeno (alternativa si persiste)\n"
-        "- Gel antiinflamatorio (uso local)\n\n"
-        "Compra aquí: https://www.amazon.com/s?k=ibuprofeno+400mg\n"
-        "Compra aquí: https://www.amazon.com/s?k=naproxeno\n"
-        "Compra aquí: https://www.amazon.com/s?k=gel+antiinflamatorio"
-    ),
-    "Deshidratación": (
-        "Recomendaciones:\n"
-        "- Beber suero oral o agua con electrolitos\n"
-        "- Vida Suero Oral (cada 6h)\n\n"
-        "Compra aquí: https://www.amazon.com/s?k=suero+oral\n"
-        "Compra aquí: https://www.amazon.com/s?k=agua+con+electrolitos"
-    ),
-    "Visión borrosa": (
-        "Recomendación:\n"
-        "- Acude a un oftalmólogo para diagnóstico\n"
-        "- Evita automedicación sin receta\n\n"
-        "Consulta opciones: https://www.amazon.com/s?k=opciones+oftalmológicas"
-    ),
-    "Dolores Crónicos": (
-        "Medicamentos sugeridos para Dolores Crónicos:\n"
-        "- Naproxeno 500mg (cada 12h)\n"
-        "- Paracetamol (en combinación con otros fármacos)\n\n"
-        "Compra aquí: https://www.amazon.com/s?k=naproxeno+500mg\n"
-        "Compra aquí: https://www.amazon.com/s?k=paracetamol"
-    )
-}
-
+        soluciones = {
+            "Insomnio": (
+                "Medicamentos sugeridos para Insomnio:\n"
+                "- Melatonina 3mg (1 hora antes de dormir)\n"
+                "- Difenhidramina (uso ocasional)\n"
+                "- Valeriana (alternativa natural)\n\n"
+                "Compra aquí: https://www.amazon.com/s?k=melatonina+3mg\n"
+                "Compra aquí: https://www.amazon.com/s?k=difenhidramina\n"
+                "Compra aquí: https://www.amazon.com/s?k=valeriana"
+            ),
+            "Mareo": (
+                "Medicamentos sugeridos para Mareo:\n"
+                "- Dimenhidrinato 50mg (cada 8h si es necesario)\n"
+                "- Meclizina (ideal para vértigo leve)\n\n"
+                "Compra aquí: https://www.amazon.com/s?k=dimenhidrinato+50mg\n"
+                "Compra aquí: https://www.amazon.com/s?k=meclizina"
+            ),
+            "Dolor de cabeza": (
+                "Medicamentos sugeridos:\n"
+                "- Paracetamol 500mg (cada 6h si el dolor persiste)\n"
+                "- Ibuprofeno (si hay inflamación o tensión muscular)\n\n"
+                "Compra aquí: https://www.amazon.com/s?k=paracetamol+500mg\n"
+                "Compra aquí: https://www.amazon.com/s?k=ibuprofeno"
+            ),
+            "Baja glucosa": (
+                "Sugerencia:\n"
+                "- Toma jugo de naranja o come caramelos\n"
+                "- Glucosa en tabletas (si disponible)\n\n"
+                "Compra aquí: https://www.amazon.com/s?k=glucosa+en+tabletas"
+            ),
+            "Dolor de articulaciones": (
+                "Medicamentos sugeridos:\n"
+                "- Ibuprofeno 400mg (cada 8h)\n"
+                "- Naproxeno (alternativa si persiste)\n"
+                "- Gel antiinflamatorio (uso local)\n\n"
+                "Compra aquí: https://www.amazon.com/s?k=ibuprofeno+400mg\n"
+                "Compra aquí: https://www.amazon.com/s?k=naproxeno\n"
+                "Compra aquí: https://www.amazon.com/s?k=gel+antiinflamatorio"
+            ),
+            "Deshidratación": (
+                "Recomendaciones:\n"
+                "- Beber suero oral o agua con electrolitos\n"
+                "- Vida Suero Oral (cada 6h)\n\n"
+                "Compra aquí: https://www.amazon.com/s?k=suero+oral\n"
+                "Compra aquí: https://www.amazon.com/s?k=agua+con+electrolitos"
+            ),
+            "Visión borrosa": (
+                "Recomendación:\n"
+                "- Acude a un oftalmólogo para diagnóstico\n"
+                "- Evita automedicación sin receta\n\n"
+                "Consulta opciones: https://www.amazon.com/s?k=opciones+oftalmológicas"
+            ),
+            "Dolores Crónicos": (
+                "Medicamentos sugeridos para Dolores Crónicos:\n"
+                "- Naproxeno 500mg (cada 12h)\n"
+                "- Paracetamol (en combinación con otros fármacos)\n\n"
+                "Compra aquí: https://www.amazon.com/s?k=naproxeno+500mg\n"
+                "Compra aquí: https://www.amazon.com/s?k=paracetamol"
+            )
+        }
         
         # Responder con la solución para el síntoma seleccionado
         if text in soluciones:
