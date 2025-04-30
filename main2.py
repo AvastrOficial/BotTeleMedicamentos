@@ -6,8 +6,6 @@ TOKEN = input("Introduce el token del bot de Telegram: ")
 # Relación entre enfermedades y síntomas
 enfermedades_sintomas = {
     "Diabetes": [
-        ["Insomnio", "Mareo"],
-        ["Baja glucosa", "Dolor de cabeza"],
         ["Sed excesiva", "Micción frecuente"],
         ["Hambre constante", "Pérdida de peso sin causa aparente"],
         ["Visión borrosa", "Fatiga"],
@@ -49,9 +47,10 @@ keyboard_enfermedades = [
 
 # Teclado para síntomas
 keyboard_problemas = [
-    ["Insomnio", "Mareo"],
-    ["Visión borrosa", "Dolor de cabeza"],
-    ["Baja glucosa", "Dolor de articulaciones", "Deshidratación"]
+    ["Sed excesiva", "Micción frecuente"],
+    ["Hambre constante", "Pérdida de peso sin causa aparente"],
+    ["Visión borrosa", "Fatiga"],
+    ["Heridas que tardan en sanar"]
 ]
 
 # Generar botones de enfermedades con paginación
@@ -90,77 +89,80 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
         markup = ReplyKeyboardMarkup(botones_sintomas, one_time_keyboard=True, resize_keyboard=True)
         await update.message.reply_text(f"Selecciona un síntoma para {text}:", reply_markup=markup)
 
-    elif text in ["Insomnio", "Mareo", "Dolor de cabeza", "Baja glucosa", "Dolor de articulaciones", "Deshidratación", "Visión borrosa", "Dolores Crónicos", "Sed excesiva", "Micción frecuente", "Hambre constante", "Pérdida de peso sin causa aparente", "Fatiga", "Heridas que tardan en sanar", "Hinchazón en piernas, tobillos o pies", "Dificultad para concentrarse", "Orina espumosa", "Náuseas y vómitos", "Pérdida de apetito", "Zumbido en los oídos", "Dolor en el pecho", "Dificultad para respirar", "Sangrado nasal", "Postura encorvada", "Fracturas óseas frecuentes", "Cansancio o fatiga", "Alteraciones del sueño", "Dificultad para moverse", "Ansiedad o depresión", "Palpitaciones", "Mareos o desmayos", "Fatiga extrema"]:
+    elif text in ["Sed excesiva", "Micción frecuente", "Hambre constante", "Pérdida de peso sin causa aparente", "Visión borrosa", "Fatiga", "Heridas que tardan en sanar", "Fatiga extrema", "Hinchazón en piernas, tobillos o pies", "Dificultad para concentrarse", "Orina espumosa", "Náuseas y vómitos", "Pérdida de apetito", "Dolor de cabeza", "Mareos", "Dolor en el pecho", "Dificultad para respirar", "Sangrado nasal", "Postura encorvada", "Fracturas óseas frecuentes", "Cansancio o fatiga", "Alteraciones del sueño", "Dificultad para moverse", "Ansiedad o depresión", "Palpitaciones", "Mareos o desmayos"]:
         # Mostrar soluciones dependiendo del síntoma
         soluciones = {
-            "Insomnio": (
-                "Medicamentos sugeridos para Insomnio:\n"
-                "- Melatonina 3mg (1 hora antes de dormir)\n"
-                "- Difenhidramina (uso ocasional)\n"
-                "- Valeriana (alternativa natural)\n\n"
-                "Compra aquí: https://www.amazon.com/s?k=melatonina+3mg\n"
-                "Compra aquí: https://www.amazon.com/s?k=difenhidramina\n"
-                "Compra aquí: https://www.amazon.com/s?k=valeriana"
+            "Sed excesiva": (
+                "Mantén una hidratación adecuada.\n"
+                "Recomendación: Beber entre 1.5 y 2 litros de agua al día.\n"
+                "Consulta más detalles: https://www.amazon.com/s?k=botellas+de+agua"
             ),
-            "Mareo": (
-                "Medicamentos sugeridos para Mareo:\n"
-                "- Dimenhidrinato 50mg (cada 8h si es necesario)\n"
-                "- Meclizina (ideal para vértigo leve)\n\n"
-                "Compra aquí: https://www.amazon.com/s?k=dimenhidrinato+50mg\n"
-                "Compra aquí: https://www.amazon.com/s?k=meclizina"
+            "Micción frecuente": (
+                "Controla los niveles de glucosa en sangre.\n"
+                "Consulta con un endocrinólogo para ajustes en tratamiento.\n"
+                "Compra aquí: https://www.amazon.com/s?k=glucometro"
             ),
-            "Dolor de cabeza": (
-                "Medicamentos sugeridos:\n"
-                "- Paracetamol 500mg (cada 6h si el dolor persiste)\n"
-                "- Ibuprofeno (si hay inflamación o tensión muscular)\n\n"
-                "Compra aquí: https://www.amazon.com/s?k=paracetamol+500mg\n"
-                "Compra aquí: https://www.amazon.com/s?k=ibuprofeno"
+            "Hambre constante": (
+                "Come en porciones pequeñas y frecuentes.\n"
+                "Consulta con un nutricionista para mejorar tu dieta.\n"
+                "Compra aquí: https://www.amazon.com/s?k=snacks+saludables"
             ),
-            "Baja glucosa": (
-                "Sugerencia:\n"
-                "- Toma jugo de naranja o come caramelos\n"
-                "- Glucosa en tabletas (si disponible)\n\n"
-                "Compra aquí: https://www.amazon.com/s?k=glucosa+en+tabletas"
-            ),
-            "Dolor de articulaciones": (
-                "Medicamentos sugeridos:\n"
-                "- Ibuprofeno 400mg (cada 8h)\n"
-                "- Naproxeno (alternativa si persiste)\n"
-                "- Gel antiinflamatorio (uso local)\n\n"
-                "Compra aquí: https://www.amazon.com/s?k=ibuprofeno+400mg\n"
-                "Compra aquí: https://www.amazon.com/s?k=naproxeno\n"
-                "Compra aquí: https://www.amazon.com/s?k=gel+antiinflamatorio"
-            ),
-            "Deshidratación": (
-                "Recomendaciones:\n"
-                "- Beber suero oral o agua con electrolitos\n"
-                "- Vida Suero Oral (cada 6h)\n\n"
-                "Compra aquí: https://www.amazon.com/s?k=suero+oral\n"
-                "Compra aquí: https://www.amazon.com/s?k=agua+con+electrolitos"
+            "Pérdida de peso sin causa aparente": (
+                "Consulta con un endocrinólogo para ajustes en tratamiento.\n"
+                "Realiza exámenes para verificar tu salud general.\n"
+                "Compra aquí: https://www.amazon.com/s?k=examenes+de+salud"
             ),
             "Visión borrosa": (
-                "Recomendación:\n"
-                "- Acude a un oftalmólogo para diagnóstico\n"
-                "- Evita automedicación sin receta\n\n"
-                "Consulta opciones: https://www.amazon.com/s?k=opciones+oftalmológicas"
+                "Controla niveles de glucosa.\n"
+                "Consulta al oftalmólogo si los problemas persisten.\n"
+                "Compra aquí: https://www.amazon.com/s?k=lentes+para+diabetes"
             ),
-            "Dolores Crónicos": (
-                "Medicamentos sugeridos para Dolores Crónicos:\n"
-                "- Naproxeno 500mg (cada 12h)\n"
-                "- Paracetamol (en combinación con otros fármacos)\n\n"
-                "Compra aquí: https://www.amazon.com/s?k=naproxeno+500mg\n"
-                "Compra aquí: https://www.amazon.com/s?k=paracetamol"
+            "Fatiga": (
+                "Mantén niveles estables de glucosa y descanso.\n"
+                "Consulta con un médico para verificar otras causas.\n"
+                "Compra aquí: https://www.amazon.com/s?k=supplements+for+fatigue"
             ),
-            # Agrega soluciones para los otros síntomas según corresponda
+            "Heridas que tardan en sanar": (
+                "Consulta a un médico para un control adecuado de glucosa.\n"
+                "Mantén una higiene adecuada en las heridas.\n"
+                "Compra aquí: https://www.amazon.com/s?k=productos+para+heridas"
+            ),
+            "Fatiga extrema": (
+                "Lleva una dieta balanceada y consulta a un médico.\n"
+                "Descansa adecuadamente para mejorar tu energía.\n"
+                "Compra aquí: https://www.amazon.com/s?k=vitaminas+para+fatiga"
+            ),
+            "Hinchazón en piernas, tobillos o pies": (
+                "Usa diuréticos y eleva las piernas.\n"
+                "Consulta con un médico para tratamiento adecuado.\n"
+                "Compra aquí: https://www.amazon.com/s?k=medias+de+compresion"
+            ),
+            "Dificultad para concentrarse": (
+                "Seguir tratamiento médico y descansar lo necesario.\n"
+                "Consulta con un neurólogo si la dificultad persiste.\n"
+                "Compra aquí: https://www.amazon.com/s?k=suplementos+para+concentracion"
+            ),
+            "Orina espumosa": (
+                "Realizar pruebas de función renal.\n"
+                "Consulta con un médico para tratamiento adecuado.\n"
+                "Compra aquí: https://www.amazon.com/s?k=examenes+de+funcion+renal"
+            ),
+            "Náuseas y vómitos": (
+                "Consulta al médico para control de electrolitos.\n"
+                "Mantén una dieta suave mientras te recuperas.\n"
+                "Compra aquí: https://www.amazon.com/s?k=suero+oral"
+            ),
+            "Pérdida de apetito": (
+                "Come porciones pequeñas y equilibradas.\n"
+                "Consulta con un nutricionista para plan de alimentación.\n"
+                "Compra aquí: https://www.amazon.com/s?k=suplementos+nutricionales"
+            ),
+            # Agrega las demás soluciones siguiendo el mismo formato
         }
 
-        # Responder con la solución para el síntoma seleccionado
-        if text in soluciones:
-            await update.message.reply_text(soluciones[text])
-
-    else:
-        await update.message.reply_text("Por favor selecciona una opción válida.")
-
+        respuesta = soluciones.get(text, "No se encontró una solución para este síntoma.")
+        await update.message.reply_text(respuesta)
+        
 def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
