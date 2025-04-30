@@ -91,74 +91,112 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif text in ["Sed excesiva", "Micción frecuente", "Hambre constante", "Pérdida de peso sin causa aparente", "Visión borrosa", "Fatiga", "Heridas que tardan en sanar", "Fatiga extrema", "Hinchazón en piernas, tobillos o pies", "Dificultad para concentrarse", "Orina espumosa", "Náuseas y vómitos", "Pérdida de apetito", "Dolor de cabeza", "Mareos", "Dolor en el pecho", "Dificultad para respirar", "Sangrado nasal", "Postura encorvada", "Fracturas óseas frecuentes", "Cansancio o fatiga", "Alteraciones del sueño", "Dificultad para moverse", "Ansiedad o depresión", "Palpitaciones", "Mareos o desmayos"]:
         # Mostrar soluciones dependiendo del síntoma
-        soluciones = {
-            "Sed excesiva": (
-                "Mantén una hidratación adecuada.\n"
-                "Recomendación: Beber entre 1.5 y 2 litros de agua al día.\n"
-                "Consulta más detalles: https://www.amazon.com/s?k=botellas+de+agua"
-            ),
-            "Micción frecuente": (
-                "Controla los niveles de glucosa en sangre.\n"
-                "Consulta con un endocrinólogo para ajustes en tratamiento.\n"
-                "Compra aquí: https://www.amazon.com/s?k=glucometro"
-            ),
-            "Hambre constante": (
-                "Come en porciones pequeñas y frecuentes.\n"
-                "Consulta con un nutricionista para mejorar tu dieta.\n"
-                "Compra aquí: https://www.amazon.com/s?k=snacks+saludables"
-            ),
-            "Pérdida de peso sin causa aparente": (
-                "Consulta con un endocrinólogo para ajustes en tratamiento.\n"
-                "Realiza exámenes para verificar tu salud general.\n"
-                "Compra aquí: https://www.amazon.com/s?k=examenes+de+salud"
-            ),
-            "Visión borrosa": (
-                "Controla niveles de glucosa.\n"
-                "Consulta al oftalmólogo si los problemas persisten.\n"
-                "Compra aquí: https://www.amazon.com/s?k=lentes+para+diabetes"
-            ),
-            "Fatiga": (
-                "Mantén niveles estables de glucosa y descanso.\n"
-                "Consulta con un médico para verificar otras causas.\n"
-                "Compra aquí: https://www.amazon.com/s?k=supplements+for+fatigue"
-            ),
-            "Heridas que tardan en sanar": (
-                "Consulta a un médico para un control adecuado de glucosa.\n"
-                "Mantén una higiene adecuada en las heridas.\n"
-                "Compra aquí: https://www.amazon.com/s?k=productos+para+heridas"
-            ),
-            "Fatiga extrema": (
-                "Lleva una dieta balanceada y consulta a un médico.\n"
-                "Descansa adecuadamente para mejorar tu energía.\n"
-                "Compra aquí: https://www.amazon.com/s?k=vitaminas+para+fatiga"
-            ),
-            "Hinchazón en piernas, tobillos o pies": (
-                "Usa diuréticos y eleva las piernas.\n"
-                "Consulta con un médico para tratamiento adecuado.\n"
-                "Compra aquí: https://www.amazon.com/s?k=medias+de+compresion"
-            ),
-            "Dificultad para concentrarse": (
-                "Seguir tratamiento médico y descansar lo necesario.\n"
-                "Consulta con un neurólogo si la dificultad persiste.\n"
-                "Compra aquí: https://www.amazon.com/s?k=suplementos+para+concentracion"
-            ),
-            "Orina espumosa": (
-                "Realizar pruebas de función renal.\n"
-                "Consulta con un médico para tratamiento adecuado.\n"
-                "Compra aquí: https://www.amazon.com/s?k=examenes+de+funcion+renal"
-            ),
-            "Náuseas y vómitos": (
-                "Consulta al médico para control de electrolitos.\n"
-                "Mantén una dieta suave mientras te recuperas.\n"
-                "Compra aquí: https://www.amazon.com/s?k=suero+oral"
-            ),
-            "Pérdida de apetito": (
-                "Come porciones pequeñas y equilibradas.\n"
-                "Consulta con un nutricionista para plan de alimentación.\n"
-                "Compra aquí: https://www.amazon.com/s?k=suplementos+nutricionales"
-            ),
-            # Agrega las demás soluciones siguiendo el mismo formato
-        }
+      soluciones = {
+    "Sed excesiva": {
+        "solucion": "La sed excesiva puede estar relacionada con la diabetes o deshidratación. Beber más agua es esencial. Considera una botella de agua reutilizable.",
+        "producto": "https://www.amazon.com/dp/B08HZ3V6ZP"  # Enlace a botella de agua
+    },
+    "Micción frecuente": {
+        "solucion": "La micción frecuente puede ser un síntoma de infecciones del tracto urinario. Se recomienda consultar a un médico.",
+        "producto": "https://www.amazon.com/dp/B07P8LHGZB"  # Enlace a suplemento para la salud urinaria
+    },
+    "Hambre constante": {
+        "solucion": "La hambre constante podría estar asociada con problemas metabólicos. Considera una dieta balanceada.",
+        "producto": "https://www.amazon.com/dp/B089FVG58B"  # Enlace a snacks saludables
+    },
+    "Pérdida de peso sin causa aparente": {
+        "solucion": "La pérdida de peso inexplicada debe ser evaluada por un profesional de la salud. Podría estar asociada a condiciones graves.",
+        "producto": "https://www.amazon.com/dp/B00NT1N9PA"  # Enlace a suplemento nutricional
+    },
+    "Visión borrosa": {
+        "solucion": "La visión borrosa podría ser un síntoma de diabetes o problemas oculares. Visita a un oftalmólogo.",
+        "producto": "https://www.amazon.com/dp/B07NTZT92B"  # Enlace a gotas para ojos
+    },
+    "Fatiga": {
+        "solucion": "La fatiga extrema podría estar asociada con deficiencias nutricionales. Asegúrate de descansar bien y comer saludablemente.",
+        "producto": "https://www.amazon.com/dp/B07N7Q2FNR"  # Enlace a suplemento de vitaminas
+    },
+    "Heridas que tardan en sanar": {
+        "solucion": "Si las heridas tardan en sanar, podría ser un signo de diabetes o deficiencias nutricionales. Consulta con un profesional.",
+        "producto": "https://www.amazon.com/dp/B08R9R2P75"  # Enlace a crema cicatrizante
+    },
+    "Fatiga extrema": {
+        "solucion": "La fatiga extrema puede ser señal de anemia o trastornos del sueño. Es recomendable realizar un chequeo médico.",
+        "producto": "https://www.amazon.com/dp/B00B5P3FZG"  # Enlace a suplemento energético
+    },
+    "Hinchazón en piernas, tobillos o pies": {
+        "solucion": "La hinchazón puede estar relacionada con problemas circulatorios. Usar medias de compresión puede ayudar.",
+        "producto": "https://www.amazon.com/dp/B0851XK89B"  # Enlace a medias de compresión
+    },
+    "Dificultad para concentrarse": {
+        "solucion": "La falta de concentración podría ser un síntoma de ansiedad o falta de sueño. Intenta mejorar tu rutina de descanso.",
+        "producto": "https://www.amazon.com/dp/B08ZDQF9TZ"  # Enlace a suplementos para mejorar la concentración
+    },
+    "Orina espumosa": {
+        "solucion": "La orina espumosa puede indicar problemas renales. Es recomendable realizar exámenes médicos para evaluar la función renal.",
+        "producto": "https://www.amazon.com/dp/B085M92H93"  # Enlace a suplemento renal
+    },
+    "Náuseas y vómitos": {
+        "solucion": "Las náuseas y los vómitos pueden ser signos de una infección o trastorno gastrointestinal. Mantente hidratado y considera medicamentos antieméticos.",
+        "producto": "https://www.amazon.com/dp/B08ZYQHNGX"  # Enlace a medicamento para náuseas
+    },
+    "Pérdida de apetito": {
+        "solucion": "La pérdida de apetito podría estar relacionada con estrés o deficiencias nutricionales. Consulta con un profesional si persiste.",
+        "producto": "https://www.amazon.com/dp/B01M8PL4T9"  # Enlace a suplemento para estimular el apetito
+    },
+    "Dolor de cabeza": {
+        "solucion": "El dolor de cabeza puede ser causado por tensión, migrañas o deshidratación. Asegúrate de descansar y beber agua.",
+        "producto": "https://www.amazon.com/dp/B07ZK8T2W9"  # Enlace a analgésico para dolor de cabeza
+    },
+    "Mareos": {
+        "solucion": "Los mareos pueden ser provocados por diversas causas, desde deshidratación hasta problemas del oído interno. Es importante consultar a un médico.",
+        "producto": "https://www.amazon.com/dp/B0844FVV3D"  # Enlace a suplemento para mareos
+    },
+    "Dolor en el pecho": {
+        "solucion": "El dolor en el pecho puede ser una señal de un problema cardiovascular. Es fundamental buscar atención médica inmediatamente.",
+        "producto": "https://www.amazon.com/dp/B07TTZ9X2S"  # Enlace a monitor de presión arterial
+    },
+    "Dificultad para respirar": {
+        "solucion": "La dificultad para respirar puede indicar un problema respiratorio o cardiovascular. Busca atención médica de inmediato.",
+        "producto": "https://www.amazon.com/dp/B07V5JZP4X"  # Enlace a inhalador o nebulizador
+    },
+    "Sangrado nasal": {
+        "solucion": "El sangrado nasal puede ser causado por sequedad o irritación en las fosas nasales. Mantén la humedad en el ambiente.",
+        "producto": "https://www.amazon.com/dp/B07MJJXHDB"  # Enlace a humidificador
+    },
+    "Postura encorvada": {
+        "solucion": "Una postura encorvada puede ser un signo de debilidad muscular o estrés. Realizar ejercicios de estiramiento y fortalecimiento puede ayudar.",
+        "producto": "https://www.amazon.com/dp/B08QY4JZZ7"  # Enlace a cinturón de corrección de postura
+    },
+    "Fracturas óseas frecuentes": {
+        "solucion": "Las fracturas frecuentes pueden ser un signo de osteoporosis. Es importante evaluar la salud ósea con un médico.",
+        "producto": "https://www.amazon.com/dp/B07SGZ26VY"  # Enlace a suplemento de calcio
+    },
+    "Cansancio o fatiga": {
+        "solucion": "El cansancio excesivo puede ser causado por estrés, falta de sueño o deficiencias nutricionales. Intenta descansar mejor y mejorar tu dieta.",
+        "producto": "https://www.amazon.com/dp/B08T5W8RHV"  # Enlace a suplementos energéticos
+    },
+    "Alteraciones del sueño": {
+        "solucion": "Las alteraciones del sueño pueden ser causadas por estrés o trastornos médicos. Intenta mejorar tu higiene del sueño.",
+        "producto": "https://www.amazon.com/dp/B08K2F9D69"  # Enlace a suplemento para mejorar el sueño
+    },
+    "Dificultad para moverse": {
+        "solucion": "La dificultad para moverse puede estar asociada con problemas articulares o musculares. Considera un tratamiento para el dolor o rigidez.",
+        "producto": "https://www.amazon.com/dp/B08K7JY2GS"  # Enlace a terapia de calor
+    },
+    "Ansiedad o depresión": {
+        "solucion": "La ansiedad o depresión son trastornos emocionales que deben ser tratados con apoyo profesional. Considera realizar terapia o tomar suplementos para el ánimo.",
+        "producto": "https://www.amazon.com/dp/B0851R5RT2"  # Enlace a suplemento para la ansiedad
+    },
+    "Palpitaciones": {
+        "solucion": "Las palpitaciones pueden ser causadas por ansiedad o problemas cardíacos. Si persisten, es importante consultar a un médico.",
+        "producto": "https://www.amazon.com/dp/B085RFR8NS"  # Enlace a monitor de frecuencia cardíaca
+    },
+    "Mareos o desmayos": {
+        "solucion": "Los mareos o desmayos pueden estar relacionados con problemas de presión arterial o deshidratación. Es importante consultar con un médico.",
+        "producto": "https://www.amazon.com/dp/B08F4J54YS"  # Enlace a monitor de presión arterial
+    },
+}
 
         respuesta = soluciones.get(text, "No se encontró una solución para este síntoma.")
         await update.message.reply_text(respuesta)
