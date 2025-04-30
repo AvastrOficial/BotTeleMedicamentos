@@ -5,12 +5,39 @@ TOKEN = input("Introduce el token del bot de Telegram: ")
 
 # Relación entre enfermedades y síntomas
 enfermedades_sintomas = {
-    "Diabetes": [["Insomnio", "Mareo"], ["Baja glucosa", "Dolor de cabeza"]],
-    "Enfermedades Renales": [["Dolor de cabeza", "Deshidratación"], ["Baja glucosa", "Dolores Crónicos"]],
-    "Hipertensión": [["Mareo", "Dolor de cabeza"], ["Visión borrosa", "Dolor de articulaciones"]],
-    "Descalcificación Ósea": [["Dolores Crónicos", "Deshidratación"], ["Mareo", "Visión borrosa"]],
-    "Dolores Crónicos": [["Dolor de cabeza", "Dolor de articulaciones"], ["Mareo", "Deshidratación"]],
-    "Enfermedades Cardiovasculares": [["Dolor de cabeza", "Mareo"], ["Dolores Crónicos", "Visión borrosa"]],
+    "Diabetes": [
+        ["Insomnio", "Mareo"],
+        ["Baja glucosa", "Dolor de cabeza"],
+        ["Sed excesiva", "Micción frecuente"],
+        ["Hambre constante", "Pérdida de peso sin causa aparente"],
+        ["Visión borrosa", "Fatiga"],
+        ["Heridas que tardan en sanar"]
+    ],
+    "Enfermedades Renales": [
+        ["Fatiga", "Hinchazón en piernas, tobillos o pies"],
+        ["Dificultad para concentrarse", "Orina espumosa o cambios en la frecuencia urinaria"],
+        ["Náuseas y vómitos", "Pérdida de apetito"]
+    ],
+    "Hipertensión": [
+        ["Dolor de cabeza", "Mareos"],
+        ["Visión borrosa", "Zumbido en los oídos"],
+        ["Dolor en el pecho", "Dificultad para respirar"],
+        ["Sangrado nasal", "En casos severos"]
+    ],
+    "Descalcificación Ósea": [
+        ["Dolor de espalda", "Disminución de estatura con el tiempo"],
+        ["Postura encorvada", "Fracturas óseas frecuentes o fáciles"]
+    ],
+    "Dolores Crónicos": [
+        ["Dolor persistente por más de 3 meses", "Cansancio o fatiga"],
+        ["Alteraciones del sueño", "Dificultad para moverse o realizar actividades cotidianas"],
+        ["Ansiedad o depresión relacionada al dolor"]
+    ],
+    "Enfermedades Cardiovasculares": [
+        ["Dolor en el pecho", "Falta de aire"],
+        ["Palpitaciones", "Mareos o desmayos"],
+        ["Hinchazón en piernas o tobillos", "Fatiga extrema"]
+    ]
 }
 
 # Teclado para enfermedades
@@ -22,8 +49,8 @@ keyboard_enfermedades = [
 
 # Teclado para síntomas
 keyboard_problemas = [
-    ["Insomnio", "Mareo"], 
-    ["Visión borrosa", "Dolor de cabeza"], 
+    ["Insomnio", "Mareo"],
+    ["Visión borrosa", "Dolor de cabeza"],
     ["Baja glucosa", "Dolor de articulaciones", "Deshidratación"]
 ]
 
@@ -31,7 +58,7 @@ keyboard_problemas = [
 def generar_botones_enfermedades():
     enfermedades = list(enfermedades_sintomas.keys())
     botones = []
-    # Organiza las enfermedades en grupos de 2
+    # Organiza las enfermedades en grupos de 4
     for i in range(0, len(enfermedades), 2):  # Se muestran de 2 en 2
         fila = enfermedades[i:i+2]
         botones.append(fila)
@@ -63,7 +90,7 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
         markup = ReplyKeyboardMarkup(botones_sintomas, one_time_keyboard=True, resize_keyboard=True)
         await update.message.reply_text(f"Selecciona un síntoma para {text}:", reply_markup=markup)
 
-    elif text in ["Insomnio", "Mareo", "Dolor de cabeza", "Baja glucosa", "Dolor de articulaciones", "Deshidratación", "Visión borrosa", "Dolores Crónicos"]:
+    elif text in ["Insomnio", "Mareo", "Dolor de cabeza", "Baja glucosa", "Dolor de articulaciones", "Deshidratación", "Visión borrosa", "Dolores Crónicos", "Sed excesiva", "Micción frecuente", "Hambre constante", "Pérdida de peso sin causa aparente", "Fatiga", "Heridas que tardan en sanar", "Hinchazón en piernas, tobillos o pies", "Dificultad para concentrarse", "Orina espumosa", "Náuseas y vómitos", "Pérdida de apetito", "Zumbido en los oídos", "Dolor en el pecho", "Dificultad para respirar", "Sangrado nasal", "Postura encorvada", "Fracturas óseas frecuentes", "Cansancio o fatiga", "Alteraciones del sueño", "Dificultad para moverse", "Ansiedad o depresión", "Palpitaciones", "Mareos o desmayos", "Fatiga extrema"]:
         # Mostrar soluciones dependiendo del síntoma
         soluciones = {
             "Insomnio": (
@@ -123,9 +150,10 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "- Paracetamol (en combinación con otros fármacos)\n\n"
                 "Compra aquí: https://www.amazon.com/s?k=naproxeno+500mg\n"
                 "Compra aquí: https://www.amazon.com/s?k=paracetamol"
-            )
+            ),
+            # Agrega soluciones para los otros síntomas según corresponda
         }
-        
+
         # Responder con la solución para el síntoma seleccionado
         if text in soluciones:
             await update.message.reply_text(soluciones[text])
