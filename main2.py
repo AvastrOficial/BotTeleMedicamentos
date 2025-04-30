@@ -3,8 +3,23 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 
 TOKEN = input("Introduce el token del bot de Telegram: ")
 
-# Teclados
-keyboard_enfermedades = [["Diabetes", "Enfermedades Renales"], ["Hipertensión", "Otros"]]
+# Teclados actualizados
+keyboard_enfermedades = [
+    ["Diabetes", "Enfermedades Renales"],
+    ["Hipertensión", "Descalcificación Ósea"],
+    ["Dolores Crónicos", "Enfermedades Cardiovasculares"]
+]
+
+# Relación entre enfermedades y síntomas
+enfermedades_sintomas = {
+    "Diabetes": [["Insomnio", "Mareo"], ["Baja glucosa", "Dolor de cabeza"]],
+    "Enfermedades Renales": [["Dolor de cabeza", "Deshidratación"], ["Baja glucosa", "Dolores Crónicos"]],
+    "Hipertensión": [["Mareo", "Dolor de cabeza"], ["Visión borrosa", "Dolor de articulaciones"]],
+    "Descalcificación Ósea": [["Dolores Crónicos", "Deshidratación"], ["Mareo", "Visión borrosa"]],
+    "Dolores Crónicos": [["Dolor de cabeza", "Dolor de articulaciones"], ["Mareo", "Deshidratación"]],
+    "Enfermedades Cardiovasculares": [["Dolor de cabeza", "Mareo"], ["Dolores Crónicos", "Visión borrosa"]],
+}
+
 keyboard_problemas = [["Insomnio", "Mareo"], ["Visión borrosa", "Dolor de cabeza"], ["Baja glucosa", "Dolor de articulaciones", "Deshidratación"]]
 
 # Variables para mantener el estado
@@ -32,13 +47,10 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif user_id in user_state and user_state[user_id]["step"] == "enfermedad":
         # Cuando seleccionan una enfermedad
-        if text in ["Diabetes", "Enfermedades Renales", "Hipertensión"]:
+        if text in enfermedades_sintomas:
             user_state[user_id]["enfermedad"] = text
-            markup = ReplyKeyboardMarkup(keyboard_problemas, one_time_keyboard=True, resize_keyboard=True)
-            await update.message.reply_text("¿Qué síntoma tienes?", reply_markup=markup)
-            user_state[user_id]["step"] = "sintoma"
-        elif text == "Otros":
-            markup = ReplyKeyboardMarkup(keyboard_problemas, one_time_keyboard=True, resize_keyboard=True)
+            sintomas_posibles = enfermedades_sintomas[text]
+            markup = ReplyKeyboardMarkup(sintomas_posibles, one_time_keyboard=True, resize_keyboard=True)
             await update.message.reply_text("¿Qué síntoma tienes?", reply_markup=markup)
             user_state[user_id]["step"] = "sintoma"
 
