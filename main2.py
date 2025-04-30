@@ -13,14 +13,14 @@ enfermedades_sintomas = {
     ],
     "Enfermedades Renales": [
         ["Fatiga", "Hinchazón en piernas, tobillos o pies"],
-        ["Dificultad para concentrarse", "Orina espumosa o cambios en la frecuencia urinaria"],
+        ["Dificultad para concentrarse", "Orina espumosa"],
         ["Náuseas y vómitos", "Pérdida de apetito"]
     ],
     "Hipertensión": [
         ["Dolor de cabeza", "Mareos"],
         ["Visión borrosa", "Zumbido en los oídos"],
         ["Dolor en el pecho", "Dificultad para respirar"],
-        ["Sangrado nasal", "En casos severos"]
+        ["Sangrado nasal"]
     ],
     "Descalcificación Ósea": [
         ["Dolor de espalda", "Disminución de estatura con el tiempo"],
@@ -38,60 +38,7 @@ enfermedades_sintomas = {
     ]
 }
 
-# Teclado para enfermedades
-keyboard_enfermedades = [
-    ["Diabetes", "Enfermedades Renales"],
-    ["Hipertensión", "Descalcificación Ósea"],
-    ["Dolores Crónicos", "Enfermedades Cardiovasculares"]
-]
-
-# Teclado para síntomas
-keyboard_problemas = [
-    ["Sed excesiva", "Micción frecuente"],
-    ["Hambre constante", "Pérdida de peso sin causa aparente"],
-    ["Visión borrosa", "Fatiga"],
-    ["Heridas que tardan en sanar"]
-]
-
-# Generar botones de enfermedades con paginación
-def generar_botones_enfermedades():
-    enfermedades = list(enfermedades_sintomas.keys())
-    botones = []
-    # Organiza las enfermedades en grupos de 4
-    for i in range(0, len(enfermedades), 2):  # Se muestran de 2 en 2
-        fila = enfermedades[i:i+2]
-        botones.append(fila)
-    return botones
-
-# Generar botones de síntomas según la enfermedad seleccionada
-def generar_botones_sintomas(enfermedad_seleccionada):
-    sintomas = enfermedades_sintomas[enfermedad_seleccionada]
-    botones_sintomas = []
-    # Organiza los síntomas en grupos de 2
-    for fila in sintomas:
-        botones_sintomas.append(fila)
-    return botones_sintomas
-
-# Función principal del bot
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Generar teclado de enfermedades
-    botones_enfermedades = generar_botones_enfermedades()
-    markup = ReplyKeyboardMarkup(botones_enfermedades, one_time_keyboard=True, resize_keyboard=True)
-    await update.message.reply_text("Selecciona tu enfermedad:", reply_markup=markup)
-
-# Función para manejar las respuestas de los usuarios
-async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
-    
-    if text in enfermedades_sintomas:
-        # Si el texto es una enfermedad, se muestran los síntomas relacionados
-        botones_sintomas = generar_botones_sintomas(text)
-        markup = ReplyKeyboardMarkup(botones_sintomas, one_time_keyboard=True, resize_keyboard=True)
-        await update.message.reply_text(f"Selecciona un síntoma para {text}:", reply_markup=markup)
-
-    elif text in ["Sed excesiva", "Micción frecuente", "Hambre constante", "Pérdida de peso sin causa aparente", "Visión borrosa", "Fatiga", "Heridas que tardan en sanar", "Fatiga extrema", "Hinchazón en piernas, tobillos o pies", "Dificultad para concentrarse", "Orina espumosa", "Náuseas y vómitos", "Pérdida de apetito", "Dolor de cabeza", "Mareos", "Dolor en el pecho", "Dificultad para respirar", "Sangrado nasal", "Postura encorvada", "Fracturas óseas frecuentes", "Cansancio o fatiga", "Alteraciones del sueño", "Dificultad para moverse", "Ansiedad o depresión", "Palpitaciones", "Mareos o desmayos"]:
-        # Mostrar soluciones dependiendo del síntoma
-      soluciones = {
+   soluciones = {
     "Sed excesiva": {
         "solucion": "La sed excesiva puede estar relacionada con la diabetes o deshidratación. Beber más agua es esencial. Considera una botella de agua reutilizable.",
         "producto": "https://www.amazon.com/dp/B08HZ3V6ZP"  # Enlace a botella de agua
@@ -197,20 +144,49 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "producto": "https://www.amazon.com/dp/B08F4J54YS"  # Enlace a monitor de presión arterial
     }
 }
+# Generar botones de enfermedades
+def generar_botones_enfermedades():
+    enfermedades = list(enfermedades_sintomas.keys())
+    botones = []
+    for i in range(0, len(enfermedades), 2):
+        fila = enfermedades[i:i+2]
+        botones.append(fila)
+    return botones
 
-  # Función para obtener la solución y producto de Amazon según el síntoma
-def obtener_solucion(sintoma):
-    if sintoma in soluciones:
-        solucion = soluciones[sintoma]
-        return f"Solución recomendada: {solucion['solucion']}\nPuedes encontrar un producto relacionado aquí: {solucion['producto']}"
+# Generar botones de síntomas según la enfermedad seleccionada
+def generar_botones_sintomas(enfermedad_seleccionada):
+    sintomas = enfermedades_sintomas[enfermedad_seleccionada]
+    return sintomas
+
+# Comando /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    botones_enfermedades = generar_botones_enfermedades()
+    markup = ReplyKeyboardMarkup(botones_enfermedades, one_time_keyboard=True, resize_keyboard=True)
+    await update.message.reply_text("Selecciona tu enfermedad:", reply_markup=markup)
+
+# Manejar respuestas
+async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text
+
+    if text in enfermedades_sintomas:
+        botones_sintomas = generar_botones_sintomas(text)
+        markup = ReplyKeyboardMarkup(botones_sintomas, one_time_keyboard=True, resize_keyboard=True)
+        await update.message.reply_text(f"Selecciona un síntoma para {text}:", reply_markup=markup)
+
+    elif text in soluciones:
+        respuesta = soluciones[text]
+        mensaje = f"{respuesta['solucion']}\nProducto recomendado: {respuesta['producto']}"
+        await update.message.reply_text(mensaje)
+
     else:
-        return "Síntoma no reconocido. Por favor, proporciona un síntoma válido."
+        await update.message.reply_text("No entendí tu mensaje. Por favor selecciona una enfermedad o un síntoma.")
 
+# MAIN para arrancar el bot
 def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_response))
-    print("Bot iniciado.")
+    print("Bot corriendo...")
     app.run_polling()
 
 if __name__ == "__main__":
