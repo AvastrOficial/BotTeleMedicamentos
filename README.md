@@ -1,8 +1,8 @@
 # BotTeleMedicamentos
 Este bot está diseñado como asistente médico básico orientado a enfermedades crónicas y síntomas comunes.
-<br>
+<br></br>
 Responde preguntas sobre tu salud y recibe recomendaciones básicas. Detecta enfermedades como Diabetes, Hipertensión o Renales, y síntomas como insomnio, mareo o dolor de cabeza.
-
+<br></br>
 requerimientos que cupa : 
 <br>
 ```bash
