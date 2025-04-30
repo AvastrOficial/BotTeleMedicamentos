@@ -3,13 +3,6 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 
 TOKEN = input("Introduce el token del bot de Telegram: ")
 
-# Teclados actualizados
-keyboard_enfermedades = [
-    ["Diabetes", "Enfermedades Renales"],
-    ["Hipertensión", "Descalcificación Ósea"],
-    ["Dolores Crónicos", "Enfermedades Cardiovasculares"]
-]
-
 # Relación entre enfermedades y síntomas
 enfermedades_sintomas = {
     "Diabetes": [["Insomnio", "Mareo"], ["Baja glucosa", "Dolor de cabeza"]],
@@ -20,43 +13,59 @@ enfermedades_sintomas = {
     "Enfermedades Cardiovasculares": [["Dolor de cabeza", "Mareo"], ["Dolores Crónicos", "Visión borrosa"]],
 }
 
-keyboard_problemas = [["Insomnio", "Mareo"], ["Visión borrosa", "Dolor de cabeza"], ["Baja glucosa", "Dolor de articulaciones", "Deshidratación"]]
+# Teclado para enfermedades
+keyboard_enfermedades = [
+    ["Diabetes", "Enfermedades Renales"],
+    ["Hipertensión", "Descalcificación Ósea"],
+    ["Dolores Crónicos", "Enfermedades Cardiovasculares"]
+]
 
-# Variables para mantener el estado
-user_state = {}
+# Teclado para síntomas
+keyboard_problemas = [
+    ["Insomnio", "Mareo"], 
+    ["Visión borrosa", "Dolor de cabeza"], 
+    ["Baja glucosa", "Dolor de articulaciones", "Deshidratación"]
+]
 
+# Generar botones de enfermedades con paginación
+def generar_botones_enfermedades():
+    enfermedades = list(enfermedades_sintomas.keys())
+    botones = []
+    # Organiza las enfermedades en grupos de 4
+    for i in range(0, len(enfermedades), 2):  # Se muestran de 2 en 2
+        fila = enfermedades[i:i+2]
+        botones.append(fila)
+    return botones
+
+# Generar botones de síntomas según la enfermedad seleccionada
+def generar_botones_sintomas(enfermedad_seleccionada):
+    sintomas = enfermedades_sintomas[enfermedad_seleccionada]
+    botones_sintomas = []
+    # Organiza los síntomas en grupos de 2
+    for fila in sintomas:
+        botones_sintomas.append(fila)
+    return botones_sintomas
+
+# Función principal del bot
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    reply_keyboard = [["Sí", "No"]]
-    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True, resize_keyboard=True)
-    await update.message.reply_text("¿Tienes una enfermedad crónica o degenerativa?", reply_markup=markup)
+    # Generar teclado de enfermedades
+    botones_enfermedades = generar_botones_enfermedades()
+    markup = ReplyKeyboardMarkup(botones_enfermedades, one_time_keyboard=True, resize_keyboard=True)
+    await update.message.reply_text("Selecciona tu enfermedad:", reply_markup=markup)
 
+# Función para manejar las respuestas de los usuarios
 async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-    user_id = update.message.from_user.id
+    
+    if text in enfermedades_sintomas:
+        # Si el texto es una enfermedad, se muestran los síntomas relacionados
+        botones_sintomas = generar_botones_sintomas(text)
+        markup = ReplyKeyboardMarkup(botones_sintomas, one_time_keyboard=True, resize_keyboard=True)
+        await update.message.reply_text(f"Selecciona un síntoma para {text}:", reply_markup=markup)
 
-    # Manejar el flujo de enfermedades
-    if text == "Sí":
-        markup = ReplyKeyboardMarkup(keyboard_enfermedades, one_time_keyboard=True, resize_keyboard=True)
-        await update.message.reply_text("Selecciona tu enfermedad:", reply_markup=markup)
-        user_state[user_id] = {"step": "enfermedad"}
-
-    elif text == "No":
-        await update.message.reply_text("Gracias por tu respuesta. ¡Cuídate!")
-        if user_id in user_state:
-            del user_state[user_id]
-
-    elif user_id in user_state and user_state[user_id]["step"] == "enfermedad":
-        # Cuando seleccionan una enfermedad
-        if text in enfermedades_sintomas:
-            user_state[user_id]["enfermedad"] = text
-            sintomas_posibles = enfermedades_sintomas[text]
-            markup = ReplyKeyboardMarkup(sintomas_posibles, one_time_keyboard=True, resize_keyboard=True)
-            await update.message.reply_text("¿Qué síntoma tienes?", reply_markup=markup)
-            user_state[user_id]["step"] = "sintoma"
-
-    elif user_id in user_state and user_state[user_id]["step"] == "sintoma":
-        # Cuando seleccionan un síntoma
-        sintomas = {
+    elif text in ["Insomnio", "Mareo", "Dolor de cabeza", "Baja glucosa", "Dolor de articulaciones", "Deshidratación", "Visión borrosa", "Dolores Crónicos"]:
+        # Mostrar soluciones dependiendo del síntoma
+        soluciones = {
             "Insomnio": (
                 "Medicamentos sugeridos para Insomnio:\n"
                 "- Melatonina 3mg (1 hora antes de dormir)\n"
@@ -69,12 +78,6 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "- Dimenhidrinato 50mg (cada 8h si es necesario)\n"
                 "- Meclizina (ideal para vértigo leve)\n\n"
                 "Compra aquí: https://www.farmalisto.com.mx/mareo"
-            ),
-            "Visión borrosa": (
-                "Recomendación:\n"
-                "- Acude a un oftalmólogo para diagnóstico\n"
-                "- Evita automedicación sin receta\n\n"
-                "Consulta opciones: https://www.farmalisto.com.mx"
             ),
             "Dolor de cabeza": (
                 "Medicamentos sugeridos:\n"
@@ -100,12 +103,27 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "- Beber suero oral o agua con electrolitos\n"
                 "- Vida Suero Oral (cada 6h)\n\n"
                 "Compra aquí: https://www.farmalisto.com.mx/suero-oral"
-            )
+            ),
+            "Visión borrosa": (
+                "Recomendación:\n"
+                "- Acude a un oftalmólogo para diagnóstico\n"
+                "- Evita automedicación sin receta\n\n"
+                "Consulta opciones: https://www.farmalisto.com.mx"
+            ),
+            "Dolores Crónicos": (
+                "Medicamentos sugeridos para Dolores Crónicos:\n"
+                "- Naproxeno 500mg (cada 12h)\n"
+                "- Paracetamol (en combinación con otros fármacos)\n\n"
+                "Compra aquí: https://www.farmalisto.com.mx/dolores-cronicos"
+            ),
         }
+        
+        # Responder con la solución para el síntoma seleccionado
+        if text in soluciones:
+            await update.message.reply_text(soluciones[text])
 
-        if text in sintomas:
-            await update.message.reply_text(sintomas[text])
-            del user_state[user_id]  # Reseteamos el estado después de proporcionar la sugerencia
+    else:
+        await update.message.reply_text("Por favor selecciona una opción válida.")
 
 def main():
     app = Application.builder().token(TOKEN).build()
