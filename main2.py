@@ -195,7 +195,7 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
     "Mareos o desmayos": {
         "solucion": "Los mareos o desmayos pueden estar relacionados con problemas de presión arterial o deshidratación. Es importante consultar con un médico.",
         "producto": "https://www.amazon.com/dp/B08F4J54YS"  # Enlace a monitor de presión arterial
-    },
+    }
 }
 
         respuesta = soluciones.get(text, "No se encontró una solución para este síntoma.")
