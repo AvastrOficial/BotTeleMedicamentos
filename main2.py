@@ -198,9 +198,14 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
 }
 
-        respuesta = soluciones.get(text, "No se encontró una solución para este síntoma.")
-        await update.message.reply_text(respuesta)
-        
+  # Función para obtener la solución y producto de Amazon según el síntoma
+def obtener_solucion(sintoma):
+    if sintoma in soluciones:
+        solucion = soluciones[sintoma]
+        return f"Solución recomendada: {solucion['solucion']}\nPuedes encontrar un producto relacionado aquí: {solucion['producto']}"
+    else:
+        return "Síntoma no reconocido. Por favor, proporciona un síntoma válido."
+
 def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
