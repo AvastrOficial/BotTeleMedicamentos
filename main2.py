@@ -123,7 +123,7 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "- Paracetamol (en combinación con otros fármacos)\n\n"
         "Compra aquí: https://www.amazon.com/s?k=naproxeno+500mg\n"
         "Compra aquí: https://www.amazon.com/s?k=paracetamol"
-    ),
+    )
 }
 
         
