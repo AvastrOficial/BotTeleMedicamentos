@@ -210,16 +210,20 @@ async def configurar_recordatorio(update: Update, context: ContextTypes.DEFAULT_
         )
         return
 
-    sintoma = query.data.split("|")[1]  # Esto debería dar el sintoma
+    # Esto debería dividir correctamente el dato
+    _, sintoma, minutos = query.data.split("|")  # Dividir en 3 partes: "hora", "sintoma", "minutos"
+
+    # Ahora sintoma y minutos deben estar correctamente asignados
+    print(f"Sintoma: {sintoma}, Minutos: {minutos}")
 
     # Definimos las opciones del teclado
-    keyboard = [
-        [InlineKeyboardButton("Cada 1 min", callback_data=f"hora|{sintoma}|1")],
-        [InlineKeyboardButton("Cada 2 min", callback_data=f"hora|{sintoma}|2")],
-        [InlineKeyboardButton("Cada 5 min", callback_data=f"hora|{sintoma}|5")],
-    ]
-    
-    # Editamos el mensaje original para agregar las opciones de los botones
+   keyboard = [
+    [InlineKeyboardButton("Cada 1 min", callback_data=f"hora|Sed excesiva|1")],
+    [InlineKeyboardButton("Cada 2 min", callback_data=f"hora|Sed excesiva|2")],
+    [InlineKeyboardButton("Cada 5 min", callback_data=f"hora|Sed excesiva|5")],
+]
+
+ # Editamos el mensaje original para agregar las opciones de los botones
     await query.edit_message_text(
         text=f"Configura el recordatorio para *{sintoma}*",
         reply_markup=InlineKeyboardMarkup(keyboard),
