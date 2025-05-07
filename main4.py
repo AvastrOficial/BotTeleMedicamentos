@@ -150,6 +150,11 @@ soluciones = {
 
 # Variable para guardar los datos del recordatorio
 recordatorios = {}
+# === Obtener la hora actual en Monterrey ===
+def hora_actual_monterrey():
+    tz = pytz.timezone('America/Monterrey')
+    ahora = datetime.now(tz)
+    return ahora.strftime('%I:%M %p (%Z)')
 
 # Generar botones de enfermedades
 def generar_botones_enfermedades():
@@ -193,19 +198,17 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("No entendí tu mensaje. Por favor selecciona una enfermedad o un síntoma.")
 
-# Función para establecer la hora y enviar el recordatorio
+# === Paso 1: Configurar recordatorio (elegir momento matutino/despertino) ===
 async def configurar_recordatorio(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    callback_data = decode_data(update.callback_query.data)
-    sintoma = callback_data["sintoma"]
+    sintoma = update.message.text.split()[-1]  # Por ejemplo: "recordatorio tos" --> sintoma='tos'
 
-    await update.callback_query.answer()
     markup = InlineKeyboardMarkup([ 
-        [InlineKeyboardButton("Despertino", callback_data=encode_data({"action": "momento", "sintoma": sintoma, "momento": "despertino"}))],
-        [InlineKeyboardButton("Matutino", callback_data=encode_data({"action": "momento", "sintoma": sintoma, "momento": "matutino"}))]
+        [InlineKeyboardButton("Despertino 🌙", callback_data=encode_data({"action": "momento", "sintoma": sintoma, "momento": "despertino"}))],
+        [InlineKeyboardButton("Matutino 🌅", callback_data=encode_data({"action": "momento", "sintoma": sintoma, "momento": "matutino"}))]
     ])
-    await update.callback_query.message.reply_text("¿Cuándo quieres el recordatorio? Elige entre 'Despertino' o 'Matutino'.", reply_markup=markup)
+    await update.message.reply_text("¿Cuándo quieres el recordatorio? Elige:", reply_markup=markup)
 
-# Elegir hora
+# === Paso 2: Elegir hora ===
 async def elegir_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
     callback_data = decode_data(update.callback_query.data)
     sintoma = callback_data["sintoma"]
@@ -229,9 +232,9 @@ async def elegir_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
     markup = InlineKeyboardMarkup(botones_horas)
 
     await update.callback_query.answer()
-    await update.callback_query.message.reply_text(f"Selecciona la hora para el recordatorio para el síntoma '{sintoma}':", reply_markup=markup)
+    await update.callback_query.message.reply_text(f"Selecciona la hora para el recordatorio del síntoma **{sintoma}**:", reply_markup=markup, parse_mode="Markdown")
 
-# Confirmar recordatorio
+# === Paso 3: Confirmar y mostrar resumen ===
 async def confirmar_recordatorio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     callback_data = decode_data(update.callback_query.data)
     sintoma = callback_data["sintoma"]
@@ -240,8 +243,18 @@ async def confirmar_recordatorio(update: Update, context: ContextTypes.DEFAULT_T
 
     recordatorios[update.callback_query.from_user.id]["hora"] = hora
 
+    # Hora actual en Monterrey para referencia
+    hora_mx = hora_actual_monterrey()
+
     await update.callback_query.answer()
-    await update.callback_query.message.reply_text(f"Recordatorio configurado para el síntoma '{sintoma}' a las {hora} ({momento}).")
+    await update.callback_query.message.reply_text(
+        f"✅ *Recordatorio configurado:*\n\n"
+        f"• Síntoma: `{sintoma}`\n"
+        f"• Momento: `{momento}`\n"
+        f"• Hora elegida: `{hora}`\n\n"
+        f"_Hora actual en Monterrey:_ *{hora_mx}*",
+        parse_mode="Markdown"
+    )
 
 # Main
 def main():
