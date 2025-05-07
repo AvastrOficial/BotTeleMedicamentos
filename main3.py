@@ -208,11 +208,13 @@ async def main():
     # Ejecuta el bot
     await application.run_polling()
 
-if __name__ == '__main__':
-    try:
-        asyncio.run(main())  # Usa asyncio.run si no hay un bucle en ejecución
-    except RuntimeError as e:
-        if 'This event loop is already running' in str(e):
-            # Si el bucle ya está en ejecución, usa await directamente
-            loop = asyncio.get_event_loop()
-            loop.create_task(main())  # Crea una tarea para ejecutarse en el bucle actual
+
+def main():
+    app = Application.builder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_response))
+    print("Bot iniciado.")
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
