@@ -1,10 +1,11 @@
-from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
+from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-import asyncio
+from datetime import datetime, timedelta
+import threading
 
 TOKEN = input("Introduce el token del bot de Telegram: ")
 
-# Relación entre enfermedades y síntomas
+# Relación entre enfermedades y síntomas (igual que en tu código anterior)
 enfermedades_sintomas = {
     "Diabetes": [
         ["Sed excesiva", "Micción frecuente"],
@@ -39,7 +40,7 @@ enfermedades_sintomas = {
     ]
 }
 
-# Diccionario de soluciones
+# Diccionario de soluciones (igual que en tu código anterior)
 soluciones = {
     "Sed excesiva": {
         "solucion": "La sed excesiva puede estar relacionada con la diabetes o deshidratación. Beber más agua es esencial. Considera una botella de agua reutilizable.",
@@ -147,80 +148,91 @@ soluciones = {
     }
 }
 
-# Función que se ejecuta cada vez que un usuario solicita la ayuda
-async def ayuda(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
-        [
-            KeyboardButton("Diabetes"),
-            KeyboardButton("Enfermedades Renales"),
-        ],
-        [
-            KeyboardButton("Hipertensión"),
-            KeyboardButton("Descalcificación Ósea"),
-        ],
-        [
-            KeyboardButton("Dolores Crónicos"),
-            KeyboardButton("Enfermedades Cardiovasculares"),
-        ],
-    ]
-    reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
-    await update.message.reply_text('Selecciona la enfermedad para ver los síntomas comunes', reply_markup=reply_markup)
+# Función para establecer la hora y enviar un recordatorio
+class Recordatorio:
+    def __init__(self, hora, duracion, dosis_por_dia):
+        self.hora = hora
+        self.duracion = duracion
+        self.dosis_por_dia = dosis_por_dia
+        self.fecha_inicio = datetime.now()
+        self.fecha_fin = self.fecha_inicio + timedelta(days=duracion)
 
-# Función que devuelve los síntomas según la enfermedad seleccionada
-async def enfermedad(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    texto = update.message.text
-    if texto in enfermedades_sintomas:
-        sintomas = "\n".join([f"- {item}" for sublist in enfermedades_sintomas[texto] for item in sublist])
-        await update.message.reply_text(f"Síntomas comunes de {texto}:\n\n{sintomas}")
+    def enviar_recordatorio(self, chat_id):
+        # Enviar un mensaje al usuario con el recordatorio
+        threading.Timer(self.hora.seconds, self.enviar_recordatorio_mensaje, [chat_id]).start()
+
+    def enviar_recordatorio_mensaje(self, chat_id):
+        message = f"Es hora de tomar tu medicamento.\n" \
+                  f"Duración del tratamiento: {self.fecha_inicio.strftime('%d/%m/%Y')} - {self.fecha_fin.strftime('%d/%m/%Y')}\n" \
+                  f"Dosis por día: {self.dosis_por_dia}\n" \
+                  f"¡Recuerda seguir las indicaciones de tu médico!"
+        # Aquí deberías enviar el mensaje a través de Telegram, con el bot
+        app.bot.send_message(chat_id, message)
+
+# Generar botones de enfermedades
+def generar_botones_enfermedades():
+    enfermedades = list(enfermedades_sintomas.keys())
+    botones = []
+    for i in range(0, len(enfermedades), 2):
+        fila = enfermedades[i:i+2]
+        botones.append(fila)
+    return botones
+
+# Generar botones de síntomas según la enfermedad seleccionada
+def generar_botones_sintomas(enfermedad_seleccionada):
+    sintomas = enfermedades_sintomas[enfermedad_seleccionada]
+    return sintomas
+
+# Comando /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    botones_enfermedades = generar_botones_enfermedades()
+    markup = ReplyKeyboardMarkup(botones_enfermedades, one_time_keyboard=True, resize_keyboard=True)
+    await update.message.reply_text("Selecciona tu enfermedad:", reply_markup=markup)
+
+# Manejar respuestas
+async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text
+
+    if text in enfermedades_sintomas:
+        botones_sintomas = generar_botones_sintomas(text)
+        markup = ReplyKeyboardMarkup(botones_sintomas, one_time_keyboard=True, resize_keyboard=True)
+        await update.message.reply_text(f"Selecciona un síntoma para {text}:", reply_markup=markup)
+
+    elif text in soluciones:
+        respuesta = soluciones[text]
+        mensaje = f"{respuesta['solucion']}\nProducto recomendado: {respuesta['producto']}"
+        await update.message.reply_text(mensaje)
+
+    elif text.lower() == "recordatorio":
+        # Pedir hora para el recordatorio
+        await update.message.reply_text("Por favor, indica la hora (formato 24 horas) para tomar el medicamento (ejemplo: 14:30):")
+        return
+
+    elif text.count(":") == 1 and all(part.isdigit() for part in text.split(":")):
+        # Validar formato de hora (hh:mm)
+        hora_str = text.strip()
+        try:
+            hora = datetime.strptime(hora_str, "%H:%M")
+            # Establecer duración del tratamiento y dosis
+            duracion = 7  # Por ejemplo, tratamiento de 7 días
+            dosis_por_dia = 2  # Por ejemplo, 2 dosis por día
+            recordatorio = Recordatorio(hora, duracion, dosis_por_dia)
+            # Enviar recordatorio a la hora indicada
+            recordatorio.enviar_recordatorio(update.message.chat_id)
+            await update.message.reply_text(f"Recordatorio establecido a las {hora_str}. Duración del tratamiento: {duracion} días. Dosis por día: {dosis_por_dia}")
+        except ValueError:
+            await update.message.reply_text("Por favor, usa el formato correcto para la hora (ejemplo: 14:30).")
+
     else:
-        await update.message.reply_text("Lo siento, no tengo información sobre esa enfermedad.")
+        await update.message.reply_text("No entendí tu mensaje. Por favor selecciona una enfermedad o un síntoma.")
 
-# Función que recomienda productos para cada síntoma
-async def recomendar(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    texto = update.message.text
-    if texto in soluciones:
-        solucion = soluciones[texto]["solucion"]
-        producto = soluciones[texto]["producto"]
-        await update.message.reply_text(f"Recomendación para el síntoma '{texto}':\n\n{solucion}\n\nPuedes encontrar productos recomendados aquí: {producto}")
-    else:
-        await update.message.reply_text("Lo siento, no tengo recomendaciones para ese síntoma.")
-
-# Configuración del bot
-async def main():
-    application = Application.builder().token(TOKEN).build()
-
-    # Comandos
-    application.add_handler(CommandHandler("start", ayuda))
-
-    # Mensajes
-    application.add_handler(MessageHandler(filters.Text("Diabetes"), enfermedad))
-    application.add_handler(MessageHandler(filters.Text("Enfermedades Renales"), enfermedad))
-    application.add_handler(MessageHandler(filters.Text("Hipertensión"), enfermedad))
-    application.add_handler(MessageHandler(filters.Text("Descalcificación Ósea"), enfermedad))
-    application.add_handler(MessageHandler(filters.Text("Dolores Crónicos"), enfermedad))
-    application.add_handler(MessageHandler(filters.Text("Enfermedades Cardiovasculares"), enfermedad))
-    
-    application.add_handler(MessageHandler(filters.Text("Sed excesiva"), recomendar))
-    application.add_handler(MessageHandler(filters.Text("Micción frecuente"), recomendar))
-    application.add_handler(MessageHandler(filters.Text("Hambre constante"), recomendar))
-    application.add_handler(MessageHandler(filters.Text("Pérdida de peso sin causa aparente"), recomendar))
-
-    # Ejecuta el bot
-    await application.run_polling()
-# Definición de la función start antes de usarla
-def start(update: Update, context):
-    update.message.reply_text('¡Hola! Soy tu bot médico. ¿En qué te puedo ayudar?')
-
-# Función que maneja los mensajes
-def handle_response(update: Update, context):
-    update.message.reply_text('Gracias por tu mensaje, pronto recibirás una respuesta.')
-
+# MAIN para arrancar el bot
 def main():
     app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))  # Comando /start
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_response))  # Mensajes generales
-    print("Bot iniciado.")
-    app.run_polling()  # Empieza a recibir actualizaciones
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_response))
+    print("Bot corriendo...")
+    app.run_polling()
 
 if __name__ == "__main__":
     main()
