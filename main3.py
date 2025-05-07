@@ -1,7 +1,6 @@
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
-from datetime import datetime, timedelta
-import pytz
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+import asyncio
 
 TOKEN = input("Introduce el token del bot de Telegram: ")
 
@@ -145,14 +144,6 @@ soluciones = {
     "Mareos o desmayos": {
         "solucion": "Los mareos o desmayos pueden estar relacionados con problemas de presión arterial o deshidratación. Es importante consultar con un médico.",
         "producto": "https://www.amazon.com/s?k=blood+pressure+monitor"
-    },
-    "Hinchazón en piernas o tobillos": {
-        "solucion": "La hinchazón podría ser un signo de problemas circulatorios o insuficiencia cardíaca. Consultar a un médico es fundamental.",
-        "producto": "https://www.amazon.com/s?k=compressive+socks"
-    },
-    "Fatiga extrema": {
-        "solucion": "La fatiga extrema puede estar relacionada con trastornos del sueño o problemas cardíacos. Visita a un médico si es recurrente.",
-        "producto": "https://www.amazon.com/s?k=multivitamin+for+energy"
     }
 }
 
@@ -214,10 +205,10 @@ async def main():
     application.add_handler(MessageHandler(filters.Text("Hambre constante"), recomendar))
     application.add_handler(MessageHandler(filters.Text("Pérdida de peso sin causa aparente"), recomendar))
 
+    # Ejecuta el bot
     await application.run_polling()
 
 if __name__ == '__main__':
-    import asyncio
     try:
         asyncio.run(main())  # Usa asyncio.run si no hay un bucle en ejecución
     except RuntimeError as e:
@@ -225,4 +216,3 @@ if __name__ == '__main__':
             # Si el bucle ya está en ejecución, usa await directamente
             loop = asyncio.get_event_loop()
             loop.create_task(main())  # Crea una tarea para ejecutarse en el bucle actual
-
