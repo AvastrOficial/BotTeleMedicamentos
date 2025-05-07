@@ -199,32 +199,52 @@ async def configurar_recordatorio(update: Update, context: ContextTypes.DEFAULT_
     callback_data = update.callback_query.data
     _, sintoma = callback_data.split("_")
     
-    # Pedimos la hora para el recordatorio
+    # Pedimos al usuario elegir entre "Despertino" o "Matutino"
     await update.callback_query.answer()
-    await update.callback_query.message.reply_text("¿A qué hora deseas que te recuerde tomar el medicamento? (Formato 24h, ejemplo: 14:30)")
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("Despertino", callback_data=f"despertino_{sintoma}")],
+        [InlineKeyboardButton("Matutino", callback_data=f"matutino_{sintoma}")]
+    ])
+    await update.callback_query.message.reply_text("¿Cuándo quieres el recordatorio? Elige entre 'Despertino' o 'Matutino'.", reply_markup=markup)
+
+# Función para configurar la hora según la elección (Despertino o Matutino)
+async def elegir_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    callback_data = update.callback_query.data
+    _, sintoma, momento = callback_data.split("_")
     
+    # Guardamos el momento de elección (despertino o matutino)
     recordatorios[update.callback_query.from_user.id] = {
         "sintoma": sintoma,
-        "hora": None
+        "hora": None,
+        "momento": momento
     }
+    
+    # Definir las horas según el momento elegido
+    if momento == "despertino":
+        horas = ["6:00 PM", "7:00 PM", "8:00 PM"]
+    elif momento == "matutino":
+        horas = ["7:00 AM", "8:00 AM", "9:00 AM"]
+    
+    # Creamos los botones para elegir una de las horas
+    botones_horas = [InlineKeyboardButton(hora, callback_data=f"hora_{sintoma}_{momento}_{hora}") for hora in horas]
+    markup = InlineKeyboardMarkup([botones_horas])
+    
+    await update.callback_query.answer()
+    await update.callback_query.message.reply_text(f"Elige una hora para tu recordatorio ({momento.capitalize()}):", reply_markup=markup)
 
-# Función para recibir la hora y confirmar el recordatorio
-async def recibir_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.message.from_user.id
-    if user_id in recordatorios and recordatorios[user_id]["hora"] is None:
-        hora = update.message.text.strip()
-        try:
-            # Verificamos si el formato de hora es válido
-            hora_datetime = datetime.strptime(hora, "%H:%M")
-            recordatorios[user_id]["hora"] = hora_datetime
-            await update.message.reply_text(f"Recordatorio configurado para las {hora}.")
-            
-            # Aquí puedes agregar una función para enviar el recordatorio en la hora seleccionada
-
-        except ValueError:
-            await update.message.reply_text("Formato de hora inválido. Por favor ingresa la hora en formato 24h (ejemplo: 14:30).")
-    else:
-        await update.message.reply_text("No se ha iniciado el proceso de recordatorio. Por favor selecciona un síntoma primero.")
+# Función para confirmar la hora seleccionada
+async def confirmar_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    callback_data = update.callback_query.data
+    _, sintoma, momento, hora = callback_data.split("_")
+    
+    # Confirmamos la hora seleccionada
+    user_id = update.callback_query.from_user.id
+    recordatorios[user_id]["hora"] = hora
+    
+    await update.callback_query.answer()
+    await update.callback_query.message.reply_text(f"Recordatorio configurado para {hora} ({momento.capitalize()}).")
+    
+    # Aquí se podría agregar la lógica para enviar un recordatorio a la hora seleccionada
 
 # MAIN para arrancar el bot
 def main():
@@ -232,7 +252,8 @@ def main():
     
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_response))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, recibir_hora))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, elegir_hora))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, confirmar_hora))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, configurar_recordatorio))
     
     print("Bot corriendo...")
