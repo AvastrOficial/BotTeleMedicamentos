@@ -218,4 +218,11 @@ async def main():
 
 if __name__ == '__main__':
     import asyncio
-    asyncio.run(main())
+    try:
+        asyncio.run(main())  # Usa asyncio.run si no hay un bucle en ejecución
+    except RuntimeError as e:
+        if 'This event loop is already running' in str(e):
+            # Si el bucle ya está en ejecución, usa await directamente
+            loop = asyncio.get_event_loop()
+            loop.create_task(main())  # Crea una tarea para ejecutarse en el bucle actual
+
