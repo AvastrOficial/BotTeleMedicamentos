@@ -191,17 +191,17 @@ async def manejar_sintoma(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='Markdown'
     )
 
-# Configurar recordatorio -> muestra opciones de tiempo
+# 1️⃣ Configurar recordatorio -> muestra opciones de tiempo
 async def configurar_recordatorio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    sintoma = query.data.split("_", 1)[1]
+    sintoma = query.data.split("_", 1)[1]  # Obtenemos solo el síntoma
 
     keyboard = [
-        [InlineKeyboardButton("Cada 1 min", callback_data=f"hora_{sintoma}_1")],
-        [InlineKeyboardButton("Cada 2 min", callback_data=f"hora_{sintoma}_2")],
-        [InlineKeyboardButton("Cada 5 min", callback_data=f"hora_{sintoma}_5")],
+        [InlineKeyboardButton("Cada 1 min", callback_data=f"hora|{sintoma}|1")],
+        [InlineKeyboardButton("Cada 2 min", callback_data=f"hora|{sintoma}|2")],
+        [InlineKeyboardButton("Cada 5 min", callback_data=f"hora|{sintoma}|5")],
     ]
     await query.edit_message_text(
         text=f"Configura el recordatorio para *{sintoma}*",
@@ -209,12 +209,12 @@ async def configurar_recordatorio(update: Update, context: ContextTypes.DEFAULT_
         parse_mode='Markdown'
     )
 
-# Elegir hora -> guarda recordatorio
+# 2️⃣ Elegir hora -> guarda recordatorio
 async def elegir_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    _, sintoma, minutos = query.data.split("_")
+    _, sintoma, minutos = query.data.split("|")  # Split seguro usando |
     user_id = query.from_user.id
 
     tiempo = int(minutos)
@@ -225,10 +225,10 @@ async def elegir_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='Markdown'
     )
 
-    # Opcional: Iniciar recordatorio (solo demostración, simple)
+    # Opcional: Iniciar recordatorio (simple demostración)
     asyncio.create_task(enviar_recordatorio(update, context, user_id))
 
-# Enviar recordatorio repetidamente (opcional, demostración)
+# 3️⃣ Enviar recordatorio repetidamente (opcional, demostración)
 async def enviar_recordatorio(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id):
     data = recordatorios.get(user_id)
     if not data:
