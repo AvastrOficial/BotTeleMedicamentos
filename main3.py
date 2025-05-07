@@ -1,11 +1,11 @@
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from datetime import datetime, timedelta
-import threading
+import pytz
 
 TOKEN = input("Introduce el token del bot de Telegram: ")
 
-# Relación entre enfermedades y síntomas (igual que en tu código anterior)
+# Relación entre enfermedades y síntomas
 enfermedades_sintomas = {
     "Diabetes": [
         ["Sed excesiva", "Micción frecuente"],
@@ -40,7 +40,7 @@ enfermedades_sintomas = {
     ]
 }
 
-# Diccionario de soluciones (igual que en tu código anterior)
+# Diccionario de soluciones (Definido FUERA de la función)
 soluciones = {
     "Sed excesiva": {
         "solucion": "La sed excesiva puede estar relacionada con la diabetes o deshidratación. Beber más agua es esencial. Considera una botella de agua reutilizable.",
@@ -148,26 +148,8 @@ soluciones = {
     }
 }
 
-# Función para establecer la hora y enviar un recordatorio
-class Recordatorio:
-    def __init__(self, hora, duracion, dosis_por_dia):
-        self.hora = hora
-        self.duracion = duracion
-        self.dosis_por_dia = dosis_por_dia
-        self.fecha_inicio = datetime.now()
-        self.fecha_fin = self.fecha_inicio + timedelta(days=duracion)
-
-    def enviar_recordatorio(self, chat_id):
-        # Enviar un mensaje al usuario con el recordatorio
-        threading.Timer(self.hora.seconds, self.enviar_recordatorio_mensaje, [chat_id]).start()
-
-    def enviar_recordatorio_mensaje(self, chat_id):
-        message = f"Es hora de tomar tu medicamento.\n" \
-                  f"Duración del tratamiento: {self.fecha_inicio.strftime('%d/%m/%Y')} - {self.fecha_fin.strftime('%d/%m/%Y')}\n" \
-                  f"Dosis por día: {self.dosis_por_dia}\n" \
-                  f"¡Recuerda seguir las indicaciones de tu médico!"
-        # Aquí deberías enviar el mensaje a través de Telegram, con el bot
-        app.bot.send_message(chat_id, message)
+# Variable para guardar los datos del recordatorio
+recordatorios = {}
 
 # Generar botones de enfermedades
 def generar_botones_enfermedades():
@@ -201,36 +183,58 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif text in soluciones:
         respuesta = soluciones[text]
         mensaje = f"{respuesta['solucion']}\nProducto recomendado: {respuesta['producto']}"
-        await update.message.reply_text(mensaje)
-
-    elif text.lower() == "recordatorio":
-        # Pedir hora para el recordatorio
-        await update.message.reply_text("Por favor, indica la hora (formato 24 horas) para tomar el medicamento (ejemplo: 14:30):")
-        return
-
-    elif text.count(":") == 1 and all(part.isdigit() for part in text.split(":")):
-        # Validar formato de hora (hh:mm)
-        hora_str = text.strip()
-        try:
-            hora = datetime.strptime(hora_str, "%H:%M")
-            # Establecer duración del tratamiento y dosis
-            duracion = 7  # Por ejemplo, tratamiento de 7 días
-            dosis_por_dia = 2  # Por ejemplo, 2 dosis por día
-            recordatorio = Recordatorio(hora, duracion, dosis_por_dia)
-            # Enviar recordatorio a la hora indicada
-            recordatorio.enviar_recordatorio(update.message.chat_id)
-            await update.message.reply_text(f"Recordatorio establecido a las {hora_str}. Duración del tratamiento: {duracion} días. Dosis por día: {dosis_por_dia}")
-        except ValueError:
-            await update.message.reply_text("Por favor, usa el formato correcto para la hora (ejemplo: 14:30).")
+        
+        # Botón para configurar recordatorio
+        recordatorio_button = InlineKeyboardButton("Configurar Recordatorio", callback_data=f"recordatorio_{text}")
+        markup = InlineKeyboardMarkup([[recordatorio_button]])
+        
+        await update.message.reply_text(mensaje, reply_markup=markup)
 
     else:
         await update.message.reply_text("No entendí tu mensaje. Por favor selecciona una enfermedad o un síntoma.")
 
+# Función para establecer la hora y enviar el recordatorio
+async def configurar_recordatorio(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Extraemos la información del callback
+    callback_data = update.callback_query.data
+    _, sintoma = callback_data.split("_")
+    
+    # Pedimos la hora para el recordatorio
+    await update.callback_query.answer()
+    await update.callback_query.message.reply_text("¿A qué hora deseas que te recuerde tomar el medicamento? (Formato 24h, ejemplo: 14:30)")
+    
+    recordatorios[update.callback_query.from_user.id] = {
+        "sintoma": sintoma,
+        "hora": None
+    }
+
+# Función para recibir la hora y confirmar el recordatorio
+async def recibir_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.from_user.id
+    if user_id in recordatorios and recordatorios[user_id]["hora"] is None:
+        hora = update.message.text.strip()
+        try:
+            # Verificamos si el formato de hora es válido
+            hora_datetime = datetime.strptime(hora, "%H:%M")
+            recordatorios[user_id]["hora"] = hora_datetime
+            await update.message.reply_text(f"Recordatorio configurado para las {hora}.")
+            
+            # Aquí puedes agregar una función para enviar el recordatorio en la hora seleccionada
+
+        except ValueError:
+            await update.message.reply_text("Formato de hora inválido. Por favor ingresa la hora en formato 24h (ejemplo: 14:30).")
+    else:
+        await update.message.reply_text("No se ha iniciado el proceso de recordatorio. Por favor selecciona un síntoma primero.")
+
 # MAIN para arrancar el bot
 def main():
     app = Application.builder().token(TOKEN).build()
+    
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_response))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, recibir_hora))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, configurar_recordatorio))
+    
     print("Bot corriendo...")
     app.run_polling()
 
