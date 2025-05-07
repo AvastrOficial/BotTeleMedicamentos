@@ -207,14 +207,20 @@ async def main():
 
     # Ejecuta el bot
     await application.run_polling()
+# Definición de la función start antes de usarla
+def start(update: Update, context):
+    update.message.reply_text('¡Hola! Soy tu bot médico. ¿En qué te puedo ayudar?')
 
+# Función que maneja los mensajes
+def handle_response(update: Update, context):
+    update.message.reply_text('Gracias por tu mensaje, pronto recibirás una respuesta.')
 
 def main():
     app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_response))
+    app.add_handler(CommandHandler("start", start))  # Comando /start
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_response))  # Mensajes generales
     print("Bot iniciado.")
-    app.run_polling()
+    app.run_polling()  # Empieza a recibir actualizaciones
 
 if __name__ == "__main__":
     main()
