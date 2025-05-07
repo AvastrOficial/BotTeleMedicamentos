@@ -197,15 +197,19 @@ recordatorios = {}
 # 1️⃣ Configurar recordatorio -> muestra opciones de tiempo
 async def configurar_recordatorio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # Responde al callback para que el botón se procese
 
-    sintoma = query.data.split("_", 1)[1]  # Obtenemos solo el síntoma
+    # Obtén el síntoma del callback_data
+    sintoma = query.data.split("|")[1]  # Esto debería dar el sintoma
 
+    # Definimos las opciones del teclado
     keyboard = [
         [InlineKeyboardButton("Cada 1 min", callback_data=f"hora|{sintoma}|1")],
         [InlineKeyboardButton("Cada 2 min", callback_data=f"hora|{sintoma}|2")],
         [InlineKeyboardButton("Cada 5 min", callback_data=f"hora|{sintoma}|5")],
     ]
+    
+    # Editamos el mensaje original para agregar las opciones de los botones
     await query.edit_message_text(
         text=f"Configura el recordatorio para *{sintoma}*",
         reply_markup=InlineKeyboardMarkup(keyboard),
@@ -217,14 +221,17 @@ async def elegir_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    _, sintoma, minutos = query.data.split("|")  # Split seguro usando |
+    # Recibimos los datos del botón
+    _, sintoma, minutos = query.data.split("|")  # Separar los datos usando "|"
     user_id = query.from_user.id
 
+    # Convertimos el tiempo a entero
     tiempo = int(minutos)
-    
-    # Guarda el recordatorio en el diccionario global
+
+    # Guardamos el recordatorio en el diccionario global
     recordatorios[user_id] = {"sintoma": sintoma, "intervalo": tiempo}
 
+    # Informamos al usuario que se ha configurado el recordatorio
     await query.edit_message_text(
         text=f"✅ Recordatorio configurado para *{sintoma}* cada {tiempo} minutos.",
         parse_mode='Markdown'
@@ -243,12 +250,14 @@ async def enviar_recordatorio(update: Update, context: ContextTypes.DEFAULT_TYPE
     sintoma = data["sintoma"]
 
     while True:
+        # Enviar un mensaje de recordatorio
         await context.bot.send_message(
             chat_id=user_id,
             text=f"🔔 Recordatorio de síntoma: *{sintoma}*",
             parse_mode='Markdown'
         )
-        await asyncio.sleep(intervalo * 60)
+        await asyncio.sleep(intervalo * 60)  # Esperar el tiempo definido en minutos
+
 
 # Configuración del bot
 app = Application.builder().token(TOKEN).build()
