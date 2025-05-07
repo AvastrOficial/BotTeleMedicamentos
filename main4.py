@@ -215,9 +215,7 @@ async def configurar_recordatorio(update: Update, context: ContextTypes.DEFAULT_
 
     # Ahora sintoma y minutos deben estar correctamente asignados
     print(f"Sintoma: {sintoma}, Minutos: {minutos}")
-
-    # Definimos las opciones del teclado
-  keyboard = [
+ keyboard = [
         [InlineKeyboardButton("Cada 1 min", callback_data=f"hora|{sintoma}|1")],
         [InlineKeyboardButton("Cada 2 min", callback_data=f"hora|{sintoma}|2")],
         [InlineKeyboardButton("Cada 5 min", callback_data=f"hora|{sintoma}|5")],
