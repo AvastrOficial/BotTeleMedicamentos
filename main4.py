@@ -191,6 +191,9 @@ async def manejar_sintoma(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='Markdown'
     )
 
+# Diccionario global para almacenar los recordatorios de cada usuario
+recordatorios = {}
+
 # 1️⃣ Configurar recordatorio -> muestra opciones de tiempo
 async def configurar_recordatorio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -218,6 +221,8 @@ async def elegir_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
 
     tiempo = int(minutos)
+    
+    # Guarda el recordatorio en el diccionario global
     recordatorios[user_id] = {"sintoma": sintoma, "intervalo": tiempo}
 
     await query.edit_message_text(
@@ -245,7 +250,6 @@ async def enviar_recordatorio(update: Update, context: ContextTypes.DEFAULT_TYPE
         )
         await asyncio.sleep(intervalo * 60)
 
-# -------------------
 # Configuración del bot
 app = Application.builder().token(TOKEN).build()
 
