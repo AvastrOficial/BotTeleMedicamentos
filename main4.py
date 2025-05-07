@@ -217,12 +217,11 @@ async def configurar_recordatorio(update: Update, context: ContextTypes.DEFAULT_
     print(f"Sintoma: {sintoma}, Minutos: {minutos}")
 
     # Definimos las opciones del teclado
-   keyboard = [
-    [InlineKeyboardButton("Cada 1 min", callback_data=f"hora|Sed excesiva|1")],
-    [InlineKeyboardButton("Cada 2 min", callback_data=f"hora|Sed excesiva|2")],
-    [InlineKeyboardButton("Cada 5 min", callback_data=f"hora|Sed excesiva|5")],
-]
-
+  keyboard = [
+        [InlineKeyboardButton("Cada 1 min", callback_data=f"hora|{sintoma}|1")],
+        [InlineKeyboardButton("Cada 2 min", callback_data=f"hora|{sintoma}|2")],
+        [InlineKeyboardButton("Cada 5 min", callback_data=f"hora|{sintoma}|5")],
+    ]
  # Editamos el mensaje original para agregar las opciones de los botones
     await query.edit_message_text(
         text=f"Configura el recordatorio para *{sintoma}*",
