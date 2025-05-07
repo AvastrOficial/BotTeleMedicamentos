@@ -199,7 +199,17 @@ async def configurar_recordatorio(update: Update, context: ContextTypes.DEFAULT_
     query = update.callback_query
     await query.answer()  # Responde al callback para que el botón se procese
 
-    # Obtén el síntoma del callback_data
+    # Agregar impresión para depuración
+    print(f"query.data: {query.data}")  # Esto mostrará el valor de query.data
+
+    # Verifica que la data tenga el formato esperado
+    if "|" not in query.data:
+        await query.edit_message_text(
+            text="Error: El formato del dato recibido no es correcto. Intenta de nuevo.",
+            parse_mode='Markdown'
+        )
+        return
+
     sintoma = query.data.split("|")[1]  # Esto debería dar el sintoma
 
     # Definimos las opciones del teclado
