@@ -145,146 +145,77 @@ soluciones = {
     "Mareos o desmayos": {
         "solucion": "Los mareos o desmayos pueden estar relacionados con problemas de presión arterial o deshidratación. Es importante consultar con un médico.",
         "producto": "https://www.amazon.com/s?k=blood+pressure+monitor"
+    },
+    "Hinchazón en piernas o tobillos": {
+        "solucion": "La hinchazón podría ser un signo de problemas circulatorios o insuficiencia cardíaca. Consultar a un médico es fundamental.",
+        "producto": "https://www.amazon.com/s?k=compressive+socks"
+    },
+    "Fatiga extrema": {
+        "solucion": "La fatiga extrema puede estar relacionada con trastornos del sueño o problemas cardíacos. Visita a un médico si es recurrente.",
+        "producto": "https://www.amazon.com/s?k=multivitamin+for+energy"
     }
 }
 
-# Variables para el tratamiento
-tratamiento_info = {}
+# Función que se ejecuta cada vez que un usuario solicita la ayuda
+async def ayuda(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [
+            KeyboardButton("Diabetes"),
+            KeyboardButton("Enfermedades Renales"),
+        ],
+        [
+            KeyboardButton("Hipertensión"),
+            KeyboardButton("Descalcificación Ósea"),
+        ],
+        [
+            KeyboardButton("Dolores Crónicos"),
+            KeyboardButton("Enfermedades Cardiovasculares"),
+        ],
+    ]
+    reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
+    await update.message.reply_text('Selecciona la enfermedad para ver los síntomas comunes', reply_markup=reply_markup)
 
-# Generar botones de enfermedades
-def generar_botones_enfermedades():
-    enfermedades = list(enfermedades_sintomas.keys())
-    botones = []
-    for i in range(0, len(enfermedades), 2):
-        fila = enfermedades[i:i+2]
-        botones.append(fila)
-    return botones
-
-# Generar botones de síntomas según la enfermedad seleccionada
-def generar_botones_sintomas(enfermedad_seleccionada):
-    sintomas = enfermedades_sintomas[enfermedad_seleccionada]
-    return sintomas
-
-# Selector de hora para el medicamento
-async def seleccionar_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Preguntar por la hora para el medicamento
-    await update.message.reply_text("¿A qué hora quieres tomar el medicamento? (Formato: HH:MM)")
-
-# Función para manejar la hora seleccionada
-async def manejar_hora(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    hora_str = update.message.text.strip()
-    try:
-        hora = datetime.strptime(hora_str, "%H:%M")
-        tz = pytz.timezone("America/Mexico_City")  # Cambia esto según tu zona horaria
-        hora_local = tz.localize(hora)
-
-        tratamiento_info["hora"] = hora_local
-        await update.message.reply_text(f"Has seleccionado la hora {hora_local.strftime('%H:%M')} para tomar tu medicamento.")
-        
-        # Preguntar por la duración del tratamiento
-        await update.message.reply_text("¿Cuántos días durará el tratamiento?")
-
-    except ValueError:
-        await update.message.reply_text("Formato de hora incorrecto. Por favor ingresa la hora en formato HH:MM.")
-
-# Función para manejar la duración del tratamiento
-async def manejar_duracion(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        dias = int(update.message.text.strip())
-        if dias <= 0:
-            raise ValueError
-
-        tratamiento_info["duracion"] = dias
-        tratamiento_info["fin"] = tratamiento_info["hora"] + timedelta(days=dias)
-
-        # Preguntar por el número de dosis por día
-        await update.message.reply_text("¿Cuántas dosis tomarás por día?")
-
-    except ValueError:
-        await update.message.reply_text("Por favor, ingresa un número válido para la duración del tratamiento (en días).")
-
-# Función para manejar el número de dosis
-async def manejar_dosis(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        dosis = int(update.message.text.strip())
-        if dosis <= 0:
-            raise ValueError
-
-        tratamiento_info["dosis"] = dosis
-        tratamiento_info["total_dosis"] = tratamiento_info["duracion"] * dosis
-
-        # Mostrar la información del tratamiento
-        mensaje = (
-            f"Duración del tratamiento: {tratamiento_info['duracion']} días\n"
-            f"Hora de tomar el medicamento: {tratamiento_info['hora'].strftime('%H:%M')}\n"
-            f"Número de dosis por día: {tratamiento_info['dosis']}\n"
-            f"Total de dosis: {tratamiento_info['total_dosis']}\n"
-            f"Fecha de inicio: {tratamiento_info['hora'].strftime('%Y-%m-%d')}\n"
-            f"Fecha de fin: {tratamiento_info['fin'].strftime('%Y-%m-%d')}\n"
-        )
-        await update.message.reply_text(mensaje)
-
-        # Programar recordatorio
-        await recordatorio(update, context)
-
-    except ValueError:
-        await update.message.reply_text("Por favor, ingresa un número válido para las dosis por día.")
-
-# Función para enviar un recordatorio automático
-async def recordatorio(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    hora_recordatorio = tratamiento_info["hora"]
-    segundos_para_recordatorio = (hora_recordatorio - datetime.now(pytz.timezone("America/Mexico_City"))).total_seconds()
-
-    if segundos_para_recordatorio > 0:
-        context.job_queue.run_once(
-            enviar_recordatorio,
-            segundos_para_recordatorio,
-            context=update.message.chat_id
-        )
-        await update.message.reply_text(f"Te recordaré a las {hora_recordatorio.strftime('%H:%M')} para tomar tu medicamento.")
-
-# Función para enviar el recordatorio
-async def enviar_recordatorio(context: ContextTypes.DEFAULT_TYPE):
-    chat_id = context.job.context
-    await context.bot.send_message(chat_id, "Es hora de tomar tu medicamento.")
-
-# Comando /start
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    botones_enfermedades = generar_botones_enfermedades()
-    markup = ReplyKeyboardMarkup(botones_enfermedades, one_time_keyboard=True, resize_keyboard=True)
-    await update.message.reply_text("Selecciona tu enfermedad:", reply_markup=markup)
-
-# Manejar respuestas
-async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
-
-    if text in enfermedades_sintomas:
-        botones_sintomas = generar_botones_sintomas(text)
-        markup = ReplyKeyboardMarkup(botones_sintomas, one_time_keyboard=True, resize_keyboard=True)
-        await update.message.reply_text(f"Selecciona un síntoma para {text}:", reply_markup=markup)
-
-    elif text in soluciones:
-        respuesta = soluciones[text]
-        mensaje = f"{respuesta['solucion']}\nProducto recomendado: {respuesta['producto']}"
-        await update.message.reply_text(mensaje)
-
-    elif text in tratamiento_info:
-        await seleccionar_hora(update, context)
-
+# Función que devuelve los síntomas según la enfermedad seleccionada
+async def enfermedad(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    texto = update.message.text
+    if texto in enfermedades_sintomas:
+        sintomas = "\n".join([f"- {item}" for sublist in enfermedades_sintomas[texto] for item in sublist])
+        await update.message.reply_text(f"Síntomas comunes de {texto}:\n\n{sintomas}")
     else:
-        await update.message.reply_text("No entendí tu mensaje. Por favor selecciona una enfermedad o un síntoma.")
+        await update.message.reply_text("Lo siento, no tengo información sobre esa enfermedad.")
 
-# MAIN para arrancar el bot
-def main():
-    app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_response))
-    app.add_handler(MessageHandler(filters.TEXT, manejar_hora))
-    app.add_handler(MessageHandler(filters.TEXT, manejar_duracion))
-    app.add_handler(MessageHandler(filters.TEXT, manejar_dosis))
+# Función que recomienda productos para cada síntoma
+async def recomendar(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    texto = update.message.text
+    if texto in soluciones:
+        solucion = soluciones[texto]["solucion"]
+        producto = soluciones[texto]["producto"]
+        await update.message.reply_text(f"Recomendación para el síntoma '{texto}':\n\n{solucion}\n\nPuedes encontrar productos recomendados aquí: {producto}")
+    else:
+        await update.message.reply_text("Lo siento, no tengo recomendaciones para ese síntoma.")
 
-    print("Bot corriendo...")
-    app.run_polling()
+# Configuración del bot
+async def main():
+    application = Application.builder().token(TOKEN).build()
 
-if __name__ == "__main__":
-    main()
+    # Comandos
+    application.add_handler(CommandHandler("start", ayuda))
+
+    # Mensajes
+    application.add_handler(MessageHandler(filters.Text("Diabetes"), enfermedad))
+    application.add_handler(MessageHandler(filters.Text("Enfermedades Renales"), enfermedad))
+    application.add_handler(MessageHandler(filters.Text("Hipertensión"), enfermedad))
+    application.add_handler(MessageHandler(filters.Text("Descalcificación Ósea"), enfermedad))
+    application.add_handler(MessageHandler(filters.Text("Dolores Crónicos"), enfermedad))
+    application.add_handler(MessageHandler(filters.Text("Enfermedades Cardiovasculares"), enfermedad))
+    
+    application.add_handler(MessageHandler(filters.Text("Sed excesiva"), recomendar))
+    application.add_handler(MessageHandler(filters.Text("Micción frecuente"), recomendar))
+    application.add_handler(MessageHandler(filters.Text("Hambre constante"), recomendar))
+    application.add_handler(MessageHandler(filters.Text("Pérdida de peso sin causa aparente"), recomendar))
+
+    await application.run_polling()
+
+if __name__ == '__main__':
+    import asyncio
+    asyncio.run(main())
