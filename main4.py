@@ -257,7 +257,6 @@ def main():
     application.add_handler(MessageHandler(filters.Regex("recordatorio_.*"), configurar_recordatorio))
     application.add_handler(MessageHandler(filters.Regex("hora_.*"), confirmar_recordatorio))
     
- print("Bot corriendo...")
     application.run_polling()
 
 if __name__ == "__main__":
