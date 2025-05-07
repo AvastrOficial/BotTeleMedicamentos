@@ -7,6 +7,7 @@ requerimientos que cupa :
 <br>
 ```bash
 pip install python-telegram-bot==22.0
+pip install pytz
 ```
 Oucpas Poner Tu Token De Tu Bot 
 
